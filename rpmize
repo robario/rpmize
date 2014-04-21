@@ -1,5 +1,6 @@
 #! /bin/sh
 set -o nounset -o xtrace
+VERSION=1.7.0
 
 destdir=/tmp/rpmize
 spec=${destdir}.spec
