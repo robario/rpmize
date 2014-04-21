@@ -20,9 +20,10 @@ function rpmquery
 # estimate default values
 #----------------------------------------------------------------------
 dirname=${PWD##*/}
-package=$(echo ${dirname} | sed --expression='s/[0-9.-]*$//')
+package=$(echo ${dirname} | sed --expression='s/-v\?[0-9.]*$//')
 version=${dirname#${package}}
 version=${version#-}
+version=${version#v}
 
 name=rpmized-${package}
 if $(rpmquery ${name})
