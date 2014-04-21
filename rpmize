@@ -124,40 +124,51 @@ fi
 # extract %files section automatically
 #----------------------------------------------------------------------
 info=''
+function put_entry()
+{
+  command=''
+  if ((1 < $#))
+  then
+    command="$1 "
+    shift
+  fi
+  echo "${command}${1//[^0-9a-zA-Z.\/:_-]/?}"
+}
+IFS=$'\n'
 for entry in $(find ${destdir}/)
 do
-  entry=${entry#${destdir}}
+  entry="${entry#${destdir}}"
 
   if test -d "${destdir}${entry}"
   then # entry is directory
     if test -d "${entry}"
     then # entry already exists on the system
-      owning=$(rpm --query --file ${entry})
+      owning=$(rpm --query --file "${entry}")
       if test "${owning##${name}}" = "${owning}"
       then # do nothing if it is not mine
-        echo "#%dir ${entry}"
+        put_entry '#%dir' "${entry}"
         continue
       fi
     fi
-    echo "%dir ${entry}"
+    put_entry '%dir' "${entry}"
   else # entry is file
     case "${entry}" in
-      # TODO: */man[0-9]/*) entry=${entry%%.gz} ; echo "${entry}" ;;
+      # TODO: */man[0-9]/*) entry="${entry%%.gz}" ; put_entry "${entry}" ;;
       # TODO: %config
       INSTALL|NEWS|README|AUTHORS|ChangeLog|COPYING.LIB|COPYING.LESSER|COPYING)
-        echo "%doc ${entry}"
+        put_entry '%doc' "${entry}"
         ;;
       */share/info/dir)
-        echo "%exclude ${entry}"
+        put_entry '%exclude' "${entry}"
         ;;
       */share/info/*.info*)
-        entry=${entry%.gz}
-        entry=${entry%.bz2}
-        info+=$'\n'"  /sbin/install-info@OPTION@ ${entry} %{_infodir}/dir"
-        echo "${entry}"
+        entry="${entry%.gz}"
+        entry="${entry%.bz2}"
+        info+=$'\n'"  /sbin/install-info@OPTION@ "'"'"${entry}"'"'" %{_infodir}/dir"
+        put_entry "${entry}"
         ;;
       *)
-        echo "${entry}"
+        put_entry "${entry}"
         ;;
     esac
   fi
