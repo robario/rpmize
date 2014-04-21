@@ -26,6 +26,7 @@ version=${version#-}
 version=${version#v}
 
 name=rpmized-${package}
+rpm=''
 if $(rpmquery ${name})
 then
   # There is rpmized package installed.
@@ -35,21 +36,28 @@ then
   # There is none-rpmized package installed.
   rpm=${package}
   release=0
+fi
+
+if test -n "${rpm}"
+then
+  # Extract variables from the rpm package for each unset variable.
+  if test "${version}" != "$(rpmquery ${rpm} '%{VERSION}')"
+  then
+    release=0
+  fi
+  version="${version:-$(rpmquery ${rpm} '%{VERSION}')}"
+  release="${release:-$(rpmquery ${rpm} '%{RELEASE}')}" ; release=${release//[^0-9]/} ; release=$((${release:-0} + 1))
+  summary="${summary:-$(rpmquery ${rpm} '%{SUMMARY}')}"
+  license="${license:-$(rpmquery ${rpm} '%{LICENSE}')}"
+  description="${description:-$(rpmquery ${rpm} '%{DESCRIPTION}')}"
 else
   # default values
-  version=${version:-1.0}
-  release=0
+  version=${version:-0.0.0}
+  release=1
   summary="Package ${name} created with rpmize"
   license=MIT
   description="Package ${name} created with rpmize"
 fi
-
-# Extract variables from the rpm package for each unset variable.
-version=${version:-$(rpmquery ${rpm} '%{VERSION}')} # TODO: バージョンが異なっていたらrelease=0
-release=${release:-$(rpmquery ${rpm} '%{RELEASE}')} ; release=${release//[^0-9]/} ; release=$((${release:-0} + 1))
-summary=${summary:-$(rpmquery ${rpm} '%{SUMMARY}')}
-license=${license:-$(rpmquery ${rpm} '%{LICENSE}')}
-description=${description:-$(rpmquery ${rpm} '%{DESCRIPTION}')}
 
 #----------------------------------------------------------------------
 # edit sections
