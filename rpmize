@@ -133,7 +133,7 @@ function put_entry()
     command="$1 "
     shift
   fi
-  echo "${command}${1//[^0-9a-zA-Z.\/:_-]/?}"
+  echo "${command}${1//[^*\-.\/0-9:A-Z_a-z]/?}"
 }
 IFS=$'\n'
 for entry in $(find ${destdir}/)
@@ -166,7 +166,7 @@ do
         entry="${entry%.gz}"
         entry="${entry%.bz2}"
         info+=$'\n'"  /sbin/install-info@OPTION@ "'"'"${entry}"'"'" %{_infodir}/dir"
-        put_entry "${entry}"
+        put_entry "${entry}*"
         ;;
       *)
         put_entry "${entry}"
