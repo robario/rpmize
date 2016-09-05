@@ -95,15 +95,23 @@ cat - <<EOF | tee ${spec}
 %define _prefix /usr/local
 %define __perl_provides %{nil}
 %define __perl_requires %{nil}
-%define _infodir %{_datadir}/info
-%define _mandir %{_datadir}/man
+%define _infodir %{_prefix}/share/info
+%define _mandir %{_prefix}/share/man
+%define _sysconfdir %{_prefix}/etc
+%define _localstatedir %{_prefix}/var
 %define __spec_install_pre %{___build_pre}
+%define make_install make install DESTDIR=%{?buildroot}
+%define __urlhelpercmd /usr/bin/curl
+%define __urlhelperopts --silent --show-error --fail --location -o
+%define __urlhelper_proxyopts %{?_httpproxy:--proxy %{_httpproxy}%{?_httpport::%{_httpport}}}%{!?_httpproxy:%{nil}}
+%define _urlhelper %{__urlhelpercmd} %{?__urlhelper_localopts} %{?__urlhelper_proxyopts} %{__urlhelperopts}
 
 Name: ${name}
 Version: ${version}
 Release: ${release}
 Summary: ${summary}
 License: ${license}
+Group: Development/Tools
 %description
 ${description}
 ${sections}
