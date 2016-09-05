@@ -1,6 +1,6 @@
 #! /bin/sh
 set -o nounset -o xtrace
-VERSION=1.8.0
+VERSION=1.9.0
 
 # including a hack similar QA_SKIP_BUILD_ROOT see /usr/lib/rpm/check-buildroot
 destdir=/tmp\/rpmize
@@ -21,8 +21,15 @@ function rpmquery
 #----------------------------------------------------------------------
 # estimate default values
 #----------------------------------------------------------------------
-dirname=${PWD##*/}
-package=$(echo ${dirname} | sed --expression='s/-v\?[0-9.]*$//')
+if (($# != 0))
+then
+  dirname="${1##*/}"
+  cd $(rpm --eval '%_buildrootdir')
+else
+  dirname=${PWD##*/}
+fi
+
+package=$(echo -n ${dirname} | sed --expression='s/-v\?[0-9.]*$//')
 version=${dirname#${package}}
 version=${version#-}
 version=${version#v}
