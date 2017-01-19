@@ -1,6 +1,6 @@
 #! /bin/sh
 set -o nounset -o xtrace
-VERSION=1.9.0
+VERSION=1.9.1
 
 # including a hack similar QA_SKIP_BUILD_ROOT see /usr/lib/rpm/check-buildroot
 destdir=/tmp\/rpmize
@@ -129,7 +129,7 @@ if test ! -d "${destdir}"
 then
   sed --expression='1s/^/%define __check_files %{nil}\n/' --in-place ${spec}
   rpmbuild --buildroot=${destdir} -bi ${spec} || exit
-  grep --invert-match --fixed-string '%define __check_files %{nil}' ${spec} | tee ${spec} 1>/dev/null
+  sed --silent --expression='/^%define __check_files %{nil}$/!p' --in-place ${spec}
 fi
 
 #----------------------------------------------------------------------
